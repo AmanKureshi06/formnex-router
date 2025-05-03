@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import {
   convertToCorrectTypes,
   generateDynamicSchema,
@@ -20,11 +20,9 @@ import {
  * API route for posting a lead using POST
  */
 export async function POST(
-  request: NextRequest,
-  context: { params: { id: string } }
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
-  const { params } = context;
-
   try {
     const headersList = headers();
     const authorization = headersList.get("authorization");
@@ -81,7 +79,7 @@ export async function POST(
         leadLimit = 999999;
         break;
       default:
-        leadLimit = 100;
+        leadLimit = 100; // Fallback to free tier limit
     }
 
     if (leadCount >= leadLimit) {
@@ -96,7 +94,7 @@ export async function POST(
     const parsedData = validateAndParseData(dynamicSchema, data);
 
     if (!parsedData.success) {
-      await createLog(
+      createLog(
         "error",
         "http",
         JSON.stringify(parsedData.error.format()),
@@ -114,10 +112,13 @@ export async function POST(
     await createLog("success", "http", leadId, endpoint.id);
     await incrementLeadCount(params.id);
 
+    // webhook posting -- eventually make this a background job
     if (endpoint.webhookEnabled && endpoint.webhook) {
+      // Only wait 3 second(s) for a response
       const webhookController = new AbortController();
       const webhookTimeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(async () => {
+          // create a log of the timeout error
           await createLog("error", "webhook", "Webhook timed out.", params.id);
           webhookController.abort();
           reject(new Error("Request timed out"));
@@ -148,7 +149,7 @@ export async function POST(
         }
         await createLog("error", "webhook", errorData, params.id);
       } else {
-        await createLog(
+        createLog(
           "success",
           "webhook",
           `${endpoint.webhook} -> Webhook successful`,
@@ -160,21 +161,22 @@ export async function POST(
     return NextResponse.json({ success: true, id: leadId });
   } catch (error: unknown) {
     await createLog("error", "http", getErrorMessage(error), params.id);
+
     console.error(error);
+
     return NextResponse.json({ error: "An error occurred." }, { status: 500 });
   }
 }
 
 /**
  * API route for posting a lead using GET
+ *
  * Only used when the user is posting via HTML form element
  */
 export async function GET(
-  request: NextRequest,
-  context: { params: { id: string } }
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
-  const { params } = context;
-
   try {
     const headersList = headers();
     const referer = headersList.get("referer");
@@ -217,7 +219,7 @@ export async function GET(
         leadLimit = 999999;
         break;
       default:
-        leadLimit = 100;
+        leadLimit = 100; // Fallback to free tier limit
     }
 
     if (leadCount >= leadLimit) {
@@ -234,7 +236,7 @@ export async function GET(
     const parsedData = validateAndParseData(dynamicSchema, data);
 
     if (!parsedData.success) {
-      await createLog(
+      createLog(
         "error",
         "http",
         JSON.stringify(parsedData.error.format()),
@@ -251,7 +253,9 @@ export async function GET(
     await createLog("success", "http", leadId, endpoint.id);
     await incrementLeadCount(params.id);
 
+    // webhook posting -- eventually make this a background job
     if (endpoint.webhookEnabled && endpoint.webhook) {
+      // Only wait 3 second(s) for a response
       const webhookController = new AbortController();
       const webhookTimeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(async () => {
@@ -285,7 +289,7 @@ export async function GET(
         }
         await createLog("error", "webhook", errorData, params.id);
       } else {
-        await createLog(
+        createLog(
           "success",
           "webhook",
           `${endpoint.webhook} -> Webhook successful`,
@@ -299,7 +303,9 @@ export async function GET(
     );
   } catch (error: unknown) {
     await createLog("error", "http", getErrorMessage(error), params.id);
+
     console.error(error);
+
     return NextResponse.json({ error: "An error occurred." }, { status: 500 });
   }
 }
