@@ -1,3 +1,4 @@
+"use server"
 // Component Imports
 import AccountWidget from "../auth/widget";
 import Link from "next/link";
@@ -26,7 +27,7 @@ const otherLinks = [
 
 export default async function Nav() {
   const usage = await getUsageForUser();
-  const plan = usage?.data?.plan;
+  const plan = usage?.data?.plan || "free";
 
   return (
     <nav className="p-4 flex flex-col gap-4 justify-between h-screen">

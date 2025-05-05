@@ -22,7 +22,7 @@ export const config = {
   providers: [
     Resend({
       apiKey: process.env.RESEND_API_KEY!,
-      from: "info@router.so",
+      from: "amankureshi060906@gmail.com",
       // sendVerificationRequest, -> TODO: send custom email
     }),
     GitHub, // optional GitHub provider

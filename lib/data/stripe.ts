@@ -20,7 +20,8 @@ const createStripeSessionSchema = z.object({
 export const postStripeSession = authenticatedAction
   .schema(createStripeSessionSchema)
   .action(async ({ parsedInput, ctx: { userId } }) => {
-    const host = headers().get("host");
+    const headersList = await headers();
+    const host = headersList.get("host");
     const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
 
     const [{ email }] = await db
@@ -50,7 +51,8 @@ export const postStripeSession = authenticatedAction
 
 export const createCustomerPortalSession = authenticatedAction.action(
   async ({ ctx: { userId } }) => {
-    const host = headers().get("host");
+    const headersList = await headers();
+    const host = headersList.get("host");
     const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
 
     const [{ email }] = await db

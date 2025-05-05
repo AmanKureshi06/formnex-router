@@ -24,7 +24,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const headersList = headers();
+    const headersList = await headers();
     const authorization = headersList.get("authorization");
 
     if (!authorization || !authorization.startsWith("Bearer ")) {
@@ -178,7 +178,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const headersList = headers();
+    const headersList = await headers();
     const referer = headersList.get("referer");
     const { searchParams } = new URL(request.url);
 
