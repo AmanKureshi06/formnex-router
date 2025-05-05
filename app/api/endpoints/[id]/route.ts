@@ -171,7 +171,7 @@ export async function POST(
 
 /**
  * API route for posting a lead using GET
- *
+ * API
  * Only used when the user is posting via HTML form element
  */
 export async function GET(
