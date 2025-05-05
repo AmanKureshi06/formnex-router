@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import {
   convertToCorrectTypes,
   generateDynamicSchema,
@@ -20,9 +20,10 @@ import {
  * API route for posting a lead using POST
  */
 export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+  request: NextRequest,
+  context: { params: { id: string } }
+): Promise<NextResponse> {
+  const { params } = context;
   try {
     const headersList = await headers();
     const authorization = headersList.get("authorization");
@@ -174,9 +175,10 @@ export async function POST(
  * Only used when the user is posting via HTML form element
  */
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+  request: NextRequest,
+  context: { params: { id: string } }
+): Promise<NextResponse> {
+  const { params } = context;
   try {
     const headersList = await headers();
     const referer = headersList.get("referer");
