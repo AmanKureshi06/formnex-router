@@ -29,20 +29,22 @@ const pageData = {
   description: "All collected leads for this endpoint",
 };
 
-export default async function Page({ params }: { params: { id: string } }) {
-  const leadsData = await getLeadsByEndpoint({
-    id: params.id,
-  });
+export default async function Page(
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+
+  const leadsData = await getLeadsByEndpoint({ id });
   const { data, serverError } = leadsData || {};
   if (!data || serverError) notFound();
   const { leadData: leads, schema } = data;
 
   return (
     <>
-      <Breadcrumbs leadId={params?.id} />
+      <Breadcrumbs leadId={id} />
       <PageWrapper>
         <Header title={pageData?.title}>{pageData?.description}</Header>
-        <ExportCSV id={params.id} leads={leads} schema={schema} />
+        <ExportCSV id={id} leads={leads} schema={schema} />
         <Table className="not-prose">
           <TableHeader>
             <TableRow className="bg-secondary hover:bg-secondary">
