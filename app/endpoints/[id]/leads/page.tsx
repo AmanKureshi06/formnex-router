@@ -11,7 +11,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
@@ -43,7 +42,7 @@ export default async function Page(
     <>
       <Breadcrumbs leadId={id} />
       <PageWrapper>
-        <Header title={pageData?.title}>{pageData?.description}</Header>
+        <Header title={pageData.title}>{pageData.description}</Header>
         <ExportCSV id={id} leads={leads} schema={schema} />
         <Table className="not-prose">
           <TableHeader>
