@@ -21,9 +21,9 @@ import {
  */
 export async function POST(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
-  const { params } = context;
+  const { id } = await params;
   try {
     const headersList = await headers();
     const authorization = headersList.get("authorization");
@@ -37,7 +37,7 @@ export async function POST(
 
     const token = authorization.split(" ")[1];
     const data = await request.json();
-    const endpoint = await getPostingEndpointById(params.id);
+    const endpoint = await getPostingEndpointById(id);
 
     if (!endpoint)
       return NextResponse.json(
@@ -59,8 +59,8 @@ export async function POST(
       );
     }
 
-    const plan = await getUserPlan(params.id);
-    const leadCount = await getLeadCount(params.id);
+    const plan = await getUserPlan(id);
+    const leadCount = await getLeadCount(id);
 
     let leadLimit: number;
     switch (plan) {
@@ -111,25 +111,21 @@ export async function POST(
     const leadId = await createLead(endpoint.id, parsedData.data);
 
     await createLog("success", "http", leadId, endpoint.id);
-    await incrementLeadCount(params.id);
+    await incrementLeadCount(id);
 
     // webhook posting -- eventually make this a background job
     if (endpoint.webhookEnabled && endpoint.webhook) {
-      // Only wait 3 second(s) for a response
       const webhookController = new AbortController();
       const webhookTimeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(async () => {
-          // create a log of the timeout error
-          await createLog("error", "webhook", "Webhook timed out.", params.id);
+          await createLog("error", "webhook", "Webhook timed out.", id);
           webhookController.abort();
           reject(new Error("Request timed out"));
         }, 3000);
       });
       const webhookFetchPromise: Promise<Response> = fetch(endpoint.webhook, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(parsedData.data),
         signal: webhookController.signal,
       });
@@ -141,27 +137,27 @@ export async function POST(
       if (!webhookResponse.ok) {
         const contentType = webhookResponse.headers.get("Content-Type");
         let errorData;
-        if (contentType && contentType.includes("application/json")) {
+        if (contentType?.includes("application/json")) {
           errorData = await webhookResponse.json();
-        } else if (contentType && contentType.includes("text")) {
+        } else if (contentType?.includes("text")) {
           errorData = await webhookResponse.text();
         } else {
           errorData = "Received non-text response";
         }
-        await createLog("error", "webhook", errorData, params.id);
+        await createLog("error", "webhook", errorData, id);
       } else {
         createLog(
           "success",
           "webhook",
           `${endpoint.webhook} -> Webhook successful`,
-          params.id
+          id
         );
       }
     }
 
     return NextResponse.json({ success: true, id: leadId });
   } catch (error: unknown) {
-    await createLog("error", "http", getErrorMessage(error), params.id);
+    await createLog("error", "http", getErrorMessage(error), id);
 
     console.error(error);
 
@@ -171,20 +167,19 @@ export async function POST(
 
 /**
  * API route for posting a lead using GET
- * API
  * Only used when the user is posting via HTML form element
  */
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
-  const { params } = context;
+  const { id } = await params;
   try {
     const headersList = await headers();
     const referer = headersList.get("referer");
     const { searchParams } = new URL(request.url);
 
-    const endpoint = await getPostingEndpointById(params.id);
+    const endpoint = await getPostingEndpointById(id);
 
     if (!endpoint) {
       return NextResponse.json(
@@ -200,13 +195,13 @@ export async function GET(
       );
     }
 
-    const plan = await getUserPlan(params.id);
-    const leadCount = await getLeadCount(params.id);
+    const plan = await getUserPlan(id);
+    const leadCount = await getLeadCount(id);
 
     let leadLimit: number;
     switch (plan) {
       case "free":
-        leadLimit = 100;
+        leadLimit = 100000;
         break;
       case "lite":
         leadLimit = 1000;
@@ -221,7 +216,7 @@ export async function GET(
         leadLimit = 999999;
         break;
       default:
-        leadLimit = 100; // Fallback to free tier limit
+        leadLimit = 100000; // Fallback to free tier limit
     }
 
     if (leadCount >= leadLimit) {
@@ -253,24 +248,21 @@ export async function GET(
     const leadId = await createLead(endpoint.id, parsedData.data);
 
     await createLog("success", "http", leadId, endpoint.id);
-    await incrementLeadCount(params.id);
+    await incrementLeadCount(id);
 
     // webhook posting -- eventually make this a background job
     if (endpoint.webhookEnabled && endpoint.webhook) {
-      // Only wait 3 second(s) for a response
       const webhookController = new AbortController();
       const webhookTimeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(async () => {
-          await createLog("error", "webhook", "Webhook timed out.", params.id);
+          await createLog("error", "webhook", "Webhook timed out.", id);
           webhookController.abort();
           reject(new Error("Request timed out"));
         }, 3000);
       });
       const webhookFetchPromise: Promise<Response> = fetch(endpoint.webhook, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(parsedData.data),
         signal: webhookController.signal,
       });
@@ -282,20 +274,20 @@ export async function GET(
       if (!webhookResponse.ok) {
         const contentType = webhookResponse.headers.get("Content-Type");
         let errorData;
-        if (contentType && contentType.includes("application/json")) {
+        if (contentType?.includes("application/json")) {
           errorData = await webhookResponse.json();
-        } else if (contentType && contentType.includes("text")) {
+        } else if (contentType?.includes("text")) {
           errorData = await webhookResponse.text();
         } else {
           errorData = "Received non-text response";
         }
-        await createLog("error", "webhook", errorData, params.id);
+        await createLog("error", "webhook", errorData, id);
       } else {
         createLog(
           "success",
           "webhook",
           `${endpoint.webhook} -> Webhook successful`,
-          params.id
+          id
         );
       }
     }
@@ -304,7 +296,7 @@ export async function GET(
       new URL(endpoint?.successUrl || referer || "/success")
     );
   } catch (error: unknown) {
-    await createLog("error", "http", getErrorMessage(error), params.id);
+    await createLog("error", "http", getErrorMessage(error), id);
 
     console.error(error);
 
