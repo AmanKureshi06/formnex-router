@@ -25,25 +25,25 @@ const pageData = {
   description: "Schema details and posting instructions for your endpoint",
 };
 
-export default async function Page({ params }: { params: { id: string } }) {
-  // fetch endpoint
-  const endpoint = await getEndpointById({ id: params?.id });
+export default async function Page(
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+
+  const endpoint = await getEndpointById({ id });
   const { data: endpointData, serverError } = endpoint || {};
 
-  // check for errors
   if (!endpointData || serverError) notFound();
 
   const schema = endpointData?.schema as GeneralSchema[];
 
   const url = `https://formnexapp.vercel.app/api/endpoints/${endpointData.id}`;
 
-  //  ---------- TODO: make this into its own function ----------
-  const formattedSchema = new Object() as { [key: string]: ValidationType };
+  const formattedSchema = {} as { [key: string]: ValidationType };
   schema.forEach((field) => {
     formattedSchema[field.key] = field.value;
   });
   const schemaString = JSON.stringify(formattedSchema, null, 2);
-  //  ---------------------------------------------------------
 
   const exampleCurl = `curl -X POST ${url} \\
   --header "Content-Type: application/json" \\
@@ -60,16 +60,18 @@ export default async function Page({ params }: { params: { id: string } }) {
   })`;
 
   const exampleForm = `<form action="${url}" method="GET">
-    ${schema.map(
-      (field) =>
-        `<input type="${
-          field.value === "boolean"
-            ? "checkbox"
-            : field.value === "number"
-            ? "number"
-            : "text"
-        }" name="${field.key}" />`
-    )}
+    ${schema
+      .map(
+        (field) =>
+          `<input type="${
+            field.value === "boolean"
+              ? "checkbox"
+              : field.value === "number"
+              ? "number"
+              : "text"
+          }" name="${field.key}" />`
+      )
+      .join("\n    ")}
     <button type="submit" value="Submit" />
   </form>`;
 
@@ -77,7 +79,7 @@ export default async function Page({ params }: { params: { id: string } }) {
 
   return (
     <>
-      <Breadcrumbs endpointId={endpointData.id} />
+      <Breadcrumbs endpointId={id} />
       <PageWrapper>
         <Header
           title={`${pageData?.title}: ${"`"}${endpointData?.name}${"`"}`}
@@ -87,8 +89,7 @@ export default async function Page({ params }: { params: { id: string } }) {
           <Separator />
           <h3>Posting Instructions</h3>
           <p>
-            Use the following URL to post to the endpoint for:{" "}
-            <span className="text-foreground">{endpointData?.name}</span>
+            Use the following URL to post to the endpoint for: <span className="text-foreground">{endpointData?.name}</span>
           </p>
           <pre className="relative">
             {url}
@@ -97,8 +98,7 @@ export default async function Page({ params }: { params: { id: string } }) {
 
           <h3>Post via API POST Request</h3>
           <p>
-            Send a POST request to the provided URL with the following body
-            payload structure:
+            Send a POST request to the provided URL with the following body payload structure:
           </p>
           <pre className="relative">
             {schemaString} <CopyButton text={schemaString} />
@@ -106,8 +106,7 @@ export default async function Page({ params }: { params: { id: string } }) {
 
           <p>Make sure to include the following API key as a header:</p>
           <pre className="relative">
-            {endpointData?.token}{" "}
-            <CopyButton text={endpointData?.token || ""} />
+            {endpointData?.token} <CopyButton text={endpointData?.token || ""} />
           </pre>
 
           <p>A sample CURL request would look like the following:</p>
@@ -125,8 +124,7 @@ export default async function Page({ params }: { params: { id: string } }) {
           <h3>Post via shadcn/ui Form</h3>
           <p>Install the Shadcn Form</p>
           <pre className="relative">
-            {`npx shadcn-ui@latest add form`}{" "}
-            <CopyButton text={`npx shadcn-ui@latest add form`} />
+            {`npx shadcn-ui@latest add form`} <CopyButton text={`npx shadcn-ui@latest add form`} />
           </pre>
           <p>Your shadcn/ui form should look like this:</p>
           <pre className="relative">
@@ -142,8 +140,7 @@ export default async function Page({ params }: { params: { id: string } }) {
               </pre>
               <p>Your HTML form element should look like this:</p>
               <pre className="relative">
-                {`<form action="${url}" method="GET">`}{" "}
-                <CopyButton text={`<form action="${url}" method="GET">`} />
+                {`<form action="${url}" method="GET">`} <CopyButton text={`<form action="${url}" method="GET">`} />
               </pre>
               <span className="text-sm text-muted-foreground">
                 Make sure to use GET as the HTTP method.
@@ -164,20 +161,17 @@ export default async function Page({ params }: { params: { id: string } }) {
                 user will be redirected to these URLs. The best experience for
                 the user is to provide some sort of client-side validation on
                 your inputs so that the user cannot submit the form until all
-                inputs are valid. Formnex only does server-side validation.{" "}
-                <span className="text-red-500">
+                inputs are valid. Formnex only does server-side validation. <span className="text-red-500">
                   Please ensure you add validation on the client for the best
                   user experience.
                 </span>
               </p>
               <p>Success and fail URLs for this endpoint:</p>
               <pre className="relative">
-                {`Success URL: ${endpointData?.successUrl}`}{" "}
-                <CopyButton text={`Success URL: ${endpointData?.successUrl}`} />
+                {`Success URL: ${endpointData?.successUrl}`} <CopyButton text={`Success URL: ${endpointData?.successUrl}`} />
               </pre>
               <pre className="relative">
-                {`Fail URL: ${endpointData?.failUrl}`}{" "}
-                <CopyButton text={`Fail URL: ${endpointData?.failUrl}`} />
+                {`Fail URL: ${endpointData?.failUrl}`} <CopyButton text={`Fail URL: ${endpointData?.failUrl}`} />
               </pre>
               <p className="text-red-400 text-xs">
                 Currently no authentication is required to post leads from a
