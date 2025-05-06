@@ -44,7 +44,7 @@ export default function MagicLinkForm() {
 
   return (
     <>
-      <Form {...form}>
+      {/* <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-full space-y-2"
@@ -73,9 +73,9 @@ export default function MagicLinkForm() {
             Send Magic Link <Mail className="w-4 ml-2" />
           </Button>
         </form>
-      </Form>
+      </Form> */}
       {/* Optional GitHub Authentication */}
-      <div className="mt-4 w-full">
+      <div className="w-full">
         <Separator className="my-4" />
 
         <Button

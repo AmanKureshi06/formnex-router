@@ -65,7 +65,7 @@ export async function POST(
     let leadLimit: number;
     switch (plan) {
       case "free":
-        leadLimit = 100;
+        leadLimit = 100000;
         break;
       case "lite":
         leadLimit = 1000;
@@ -80,7 +80,7 @@ export async function POST(
         leadLimit = 999999;
         break;
       default:
-        leadLimit = 100; // Fallback to free tier limit
+        leadLimit = 100000; // Fallback to free tier limit
     }
 
     if (leadCount >= leadLimit) {

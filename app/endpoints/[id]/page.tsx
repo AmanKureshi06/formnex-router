@@ -35,7 +35,7 @@ export default async function Page({ params }: { params: { id: string } }) {
 
   const schema = endpointData?.schema as GeneralSchema[];
 
-  const url = `https://app.router.so/api/endpoints/${endpointData.id}`;
+  const url = `https://formnexapp.vercel.app/api/endpoints/${endpointData.id}`;
 
   //  ---------- TODO: make this into its own function ----------
   const formattedSchema = new Object() as { [key: string]: ValidationType };
@@ -164,7 +164,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                 user will be redirected to these URLs. The best experience for
                 the user is to provide some sort of client-side validation on
                 your inputs so that the user cannot submit the form until all
-                inputs are valid. Router.so only does server-side validation.{" "}
+                inputs are valid. Formnex only does server-side validation.{" "}
                 <span className="text-red-500">
                   Please ensure you add validation on the client for the best
                   user experience.
@@ -215,7 +215,7 @@ function Breadcrumbs({ endpointId }: { endpointId: string }) {
         src={Icon}
         width={24}
         height={24}
-        alt="Router.so Icon"
+        alt="Formnex Icon"
       />
     </Breadcrumb>
   );

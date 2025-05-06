@@ -21,13 +21,14 @@ const links = [
 ];
 
 const otherLinks = [
-  { href: "https://router.so/docs", text: "Documentation", icon: Book },
+  { href: "https://formnex.vercel.app/docs", text: "Documentation", icon: Book },
   { href: "/support", text: "Support", icon: LifeBuoy },
 ];
 
 export default async function Nav() {
   const usage = await getUsageForUser();
   const plan = usage?.data?.plan || "free";
+  const date = new Date();
 
   return (
     <nav className="p-4 flex flex-col gap-4 justify-between h-screen">
@@ -40,7 +41,7 @@ export default async function Nav() {
           src={Logo}
           width={100}
           height={18.53}
-          alt="Router.so Wordmark"
+          alt="Formnex Wordmark"
         />
       </Link>
       <div className="border bg-muted/50 rounded-lg flex flex-col justify-between p-6 h-full">
@@ -64,7 +65,7 @@ export default async function Nav() {
             <div className="flex justify-between items-center gap-2">
               <ModeToggle />
               <p className="text-xs text-muted-foreground opacity-50">
-                &copy; Router.so, 2024
+                &copy; Formnex, {date.getFullYear()}
               </p>
             </div>
           </div>

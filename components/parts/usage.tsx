@@ -73,7 +73,7 @@ export const Usage = ({
       </CardContent>
       {(plan === "free" || plan === "lite") && (
         <CardFooter className="mt-auto">
-          <UpgradePlan />
+          <UpgradePlanCard />
         </CardFooter>
       )}
     </Card>
@@ -94,6 +94,25 @@ const UpgradePlan = () => {
       </span>
       <span className="text-muted-foreground text-xs">
         Upgrade your plan to capture more leads
+      </span>
+    </Link>
+  );
+};
+const UpgradePlanCard = () => {
+  return (
+    <Link
+      href="/upgrade"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="p-4 hover:pl-5 hover:pr-3 transition-all h-full w-full border grid gap-1 border-green-500 rounded-sm bg-green-500/15 hover:bg-green-500/25"
+    >
+      <span className="flex items-center gap-1">
+        API Documentation
+        <ArrowUp className="h-4 w-4" />
+      </span>
+      <span className="text-muted-foreground text-xs">
+        Refer to our API documentation to read how to connect
+        your endpoints and capture leads.
       </span>
     </Link>
   );

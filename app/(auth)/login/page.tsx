@@ -18,7 +18,7 @@ export default async function LoginPage() {
           width={50}
           height={72}
         ></Image>
-        <p className="text-center text-xl">Welcome to router.so</p>
+        <p className="text-center text-xl">Welcome to Formnex</p>
         <p className="text-center text-muted-foreground">
           Login to access your account.
         </p>
@@ -27,11 +27,11 @@ export default async function LoginPage() {
         </div>
       </div>
       <p className="mt-4 max-w-xs text-center text-sm text-muted-foreground md:mb-24">
-        By using router.so, you agree to our{" "}
+        By using Formnex, you agree to our{" "}
         <a
           className="underline underline-offset-4"
           target="_blank"
-          href="https://router.so/privacy"
+          href="https://formnex.vercel.app/privacy"
         >
           Privacy Policy
         </a>{" "}
@@ -39,7 +39,7 @@ export default async function LoginPage() {
         <a
           className="underline underline-offset-4"
           target="_blank"
-          href="https://router.so/terms"
+          href="https://formnex.vercel.app/terms"
         >
           Terms of Service
         </a>

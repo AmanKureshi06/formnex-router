@@ -59,7 +59,7 @@ export default async function Page() {
   let leadLimit: number;
   switch (usageData?.plan) {
     case "free":
-      leadLimit = 100;
+      leadLimit = 100000;
       break;
     case "lite":
       leadLimit = 1000;
@@ -74,7 +74,7 @@ export default async function Page() {
       leadLimit = 999999;
       break;
     default:
-      leadLimit = 100; // Fallback to free tier limit
+      leadLimit = 100000; // Fallback to free tier limit
   }
 
   return (
@@ -114,7 +114,7 @@ export default async function Page() {
 const navLinks = [
   {
     name: "Endpoints",
-    description: "Create and Manage Router.so Endpoints",
+    description: "Create and Manage Formnex Endpoints",
     href: "/endpoints",
   },
   {
