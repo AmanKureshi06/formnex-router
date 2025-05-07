@@ -21,7 +21,7 @@ const links = [
 ];
 
 const otherLinks = [
-  { href: "https://formnex.vercel.app/docs", text: "Documentation", icon: Book },
+  { href: "https://formnexdocs.vercel.app/", text: "Documentation", icon: Book },
   { href: "/support", text: "Support", icon: LifeBuoy },
 ];
 
