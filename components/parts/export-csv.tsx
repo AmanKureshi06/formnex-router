@@ -32,7 +32,7 @@ export default function ExportCSV({ id, leads, schema }: ExportCSVProps) {
       const downloadUrl = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = downloadUrl;
-      link.setAttribute("download", `router_leads_${id}.csv`);
+      link.setAttribute("download", `formnex_leads_${id}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
